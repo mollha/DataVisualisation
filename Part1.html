@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3 Chart</title>
+    <script src="https://d3js.org/d3.v5.js"></script>
+</head>
+<body>
+<!-- Adapt your SVG / barchart example from last week
+by adding an enter function, so that it creates
+the correct number of bars for the data that you provide. -->
+
+<style>
+    #vis{
+        margin-top: 50px;
+    }
+
+    .bar{
+        fill: red;
+    }
+
+</style>
+
+<script>
+    function cumsum(values) {
+        let cum_array = [0];
+        for(let i = 0; i < values.length; i++){
+            cum_array.push(values[i] + cum_array[i]);
+        }
+        return cum_array;
+    }
+
+    // d3 supports chaining!
+    // can't use a javascript object as attr() param (unless import multi selection thing) to set all the attributes instead, rather than individually
+    const dataset = [50, 25, 135, 80, 40];
+    const cumulative_dataset = cumsum(dataset);
+    const spacing = 10;
+    const width = cumulative_dataset[cumulative_dataset.length -1] + ((dataset.length - 1) * spacing) ;
+
+    // Append SVG tag to html
+    let svg = d3.select("body")
+        .append("div")
+        .attr('id', 'vis')
+        .append("svg")
+        .attr("width", function(){
+            return width;
+        });
+
+    svg.selectAll("rect")
+        .data(dataset)
+        .enter()            // whatever follows this, do all of this for every piece of data in array
+        .append("rect")
+        .attr("class", 'bar')
+        .attr("width", function(d){
+            return d;
+        })
+        .attr("x", function(d, i){
+            return cumulative_dataset[i] + (i * spacing);
+        })
+        .attr("height", 100)
+        .attr("fill", "#000");
+
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", 10)
+        .attr("y", 100)
+
+    // d is the data, i is the index
+</script>
+</body>
+</html>
