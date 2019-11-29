@@ -30,6 +30,7 @@ the correct number of bars for the data that you provide. -->
         return cum_array;
     }
 
+
     // d3 supports chaining!
     // can't use a javascript object as attr() param (unless import multi selection thing) to set all the attributes instead, rather than individually
     const dataset = [50, 25, 135, 80, 40];
@@ -63,7 +64,31 @@ the correct number of bars for the data that you provide. -->
     svg.append("rect")
         .attr("width", width)
         .attr("height", 10)
-        .attr("y", 100)
+        .attr("y", 100);
+
+    let l = d3.select("body")
+        .append("div")
+        .attr('id', 'vs')
+        .append("svg")
+        .attr("width", 100);
+
+    l.selectAll("rect")
+        .data([100, 80, 40])
+        .enter()
+        .append("rect")
+        .attr("width", function(d){
+            return d;
+        })
+        .attr("y", function(d, i){
+            return i * 30;
+        })
+        .attr("height", 20)
+        .attr("fill", "black")
+
+
+    //codeowner
+
+
 
     // d is the data, i is the index
 </script>

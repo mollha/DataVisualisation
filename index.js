@@ -1,3 +1,75 @@
+class Chart{
+    constructor(width, height){
+        this.radius = Math.min(width, height) / 2;
+        this.svg = this.setup_svg();
+        this.pie = d3.pie()
+            .sort(null)
+            .value(function(d) {
+                return d.value;
+            });
+
+        this.arc = d3.arc()
+            .outerRadius(radius * 0.8)
+            .innerRadius(radius * 0.4);
+
+        this.outerArc = d3.arc()
+            .innerRadius(radius * 0.9)
+            .outerRadius(radius * 0.9);
+        this.svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    }
+
+    setup_svg(){
+        let svg = document.createElement("svg");
+        svg.append("g");
+        svg.append("g")
+            .attr("class", "slices");
+        svg.append("g")
+            .attr("class", "labels");
+        svg.append("g")
+            .attr("class", "lines");
+        return svg;
+    }
+
+    count_occurrences(genres){
+        let unique_genres = [];
+        let genre_count = [];
+        for(let genre in genres){
+            genre = genres[genre];
+            if(unique_genres.includes(genre)){
+                const index = unique_genres.indexOf(genre);
+                genre_count[index].value = ((genres.length * genre_count[index].value) + 1) / genres.length;
+            }
+            else{
+                unique_genres.push(genre);
+                genre_count.push({label: genre, value: 1 / genres.length});
+            }
+        }
+        return genre_count;
+    }
+}
+
+
+
+function count_occurrences(genres){
+        let unique_genres = [];
+        let genre_count = [];
+        for(let genre in genres){
+            genre = genres[genre];
+            if(unique_genres.includes(genre)){
+                const index = unique_genres.indexOf(genre);
+                genre_count[index].value = ((genres.length * genre_count[index].value) + 1) / genres.length;
+            }
+            else{
+                unique_genres.push(genre);
+                genre_count.push({label: genre, value: 1 / genres.length});
+            }
+        }
+        return genre_count;
+    }
+
+let all_genres = ["horror", "vampire", "childrens"];
+
+
 let svg = d3.select("body")
     .append("svg")
     .append("g");
@@ -13,17 +85,17 @@ let width = 960,
     height = 450,
     radius = Math.min(width, height) / 2;
 
-let pie = d3.layout.pie()
+let pie = d3.pie()
     .sort(null)
     .value(function(d) {
         return d.value;
     });
 
-let arc = d3.svg.arc()
+let arc = d3.arc()
     .outerRadius(radius * 0.8)
     .innerRadius(radius * 0.4);
 
-let outerArc = d3.svg.arc()
+let outerArc = d3.arc()
     .innerRadius(radius * 0.9)
     .outerRadius(radius * 0.9);
 
@@ -31,15 +103,20 @@ svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
 let key = function(d){ return d.data.label; };
 
-let color = d3.scale.ordinal()
-    .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+colors = ["#98abc5", "#ccff99", "#7b6888", "#87f1ff", "#b300b3",
+    "#3f95a1", "#ff4252", "#5e7c80", "#ff9442", "#ff99ff"];
+
+genres = randomData();
 
 function randomData (){
-    let labels = color.domain();
-    return labels.map(function(label){
-        return { label: label, value: Math.random() }
-    });
+    genres = [];
+    for(let i = 0; i < 10; i++){
+        let new_genre = all_genres[Math.floor(Math.random() * all_genres.length)];
+        genres.push(new_genre);
+    }
+    console.log(genres);
+    genres = count_occurrences(genres);
+    return genres;
 }
 
 change(randomData());
@@ -58,7 +135,8 @@ function change(data) {
 
     slice.enter()
         .insert("path")
-        .style("fill", function(d) { return color(d.data.label); })
+        .style("fill", function(d, i) {
+            return colors[i]; })
         .attr("class", "slice");
 
     slice
